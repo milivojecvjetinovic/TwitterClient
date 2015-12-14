@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">My Tweets</string>
+    <string name="login_label">Connect to Tweeter</string>
+    <string name="title_activity_timeline">Home</string>
+    <string name="compose">Compose</string>
+
+</resources>

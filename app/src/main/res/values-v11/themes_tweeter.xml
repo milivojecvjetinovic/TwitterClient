@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Tweeter" parent="@style/_Tweeter"/>
+
+  <style name="_Tweeter" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    <item name="android:editTextBackground">@drawable/tweeter_edit_text_holo_light</item>
+
+    <item name="android:textColorHighlight">#9955acee</item>
+    <item name="android:textSelectHandleLeft">@drawable/tweeter_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/tweeter_text_select_handle_right</item>
+    <item name="android:textSelectHandle">@drawable/tweeter_text_select_handle_middle</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewTweeter</item>
+
+    <item name="android:buttonStyle">@style/ButtonTweeter</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonTweeter</item>
+
+    <item name="android:listChoiceBackgroundIndicator">@drawable/tweeter_list_selector_holo_light</item>
+
+    <item name="android:activatedBackgroundIndicator">@drawable/tweeter_activated_background_holo_light</item>
+
+  </style>
+
+</resources>

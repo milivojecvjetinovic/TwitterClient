@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Tweeter" parent="@style/_Tweeter"/>
+
+  <style name="_Tweeter" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    <item name="android:editTextStyle">@style/EditTextTweeter</item>
+
+    <item name="android:textColorHighlight">#9955acee</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewTweeter</item>
+
+    <item name="android:buttonStyle">@style/ButtonTweeter</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonTweeter</item>
+
+    <item name="android:listViewStyle">@style/ListViewTweeter</item>
+
+    <item name="android:listViewWhiteStyle">@style/ListViewTweeter.White</item>
+
+    <item name="android:spinnerItemStyle">@style/SpinnerItemTweeter</item>
+
+    <item name="android:actionBarStyle">@style/ActionBarTweeter</item>
+
+
+  </style>
+
+</resources>
