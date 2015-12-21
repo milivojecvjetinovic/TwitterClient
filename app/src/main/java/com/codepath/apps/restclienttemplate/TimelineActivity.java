@@ -1,6 +1,10 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +14,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.astuetz.PagerSlidingTabStrip;
+import com.codepath.apps.restclienttemplate.adapter.SmartFragmentStatePagerAdapter;
 import com.codepath.apps.restclienttemplate.adapter.TimelineListAdapter;
+import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.MentionTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.TweetsListFragment;
 import com.codepath.apps.restclienttemplate.listener.EndlessScrollListener;
 import com.codepath.apps.restclienttemplate.models.TimelineModel;
 import com.codepath.apps.restclienttemplate.models.TwitterTimelineComparator;
+import com.codepath.apps.restclienttemplate.models.UserModel;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -31,98 +42,31 @@ public class TimelineActivity extends AppCompatActivity {
 
     private static final String TIMELINE = "TIMELINE_ACTIVITY";
     private static final String TIMELINE_ACTIVITY = "TIMELINE_ACTIVITY";
+    private ViewPager vpPager;
+    private TweetsPageAdapter tweetsPageAdapter;
     private TwitterClient client;
-    private ArrayList<TimelineModel> timeLineList;
-    private TimelineListAdapter timelineAdapter;
-    private ListView lvTweets;
-    public long sinceId;
-    public long maxId;
-
-    private SwipeRefreshLayout swipeContainer;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_timeline);
 
-        //get swipe container
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        if(savedInstanceState == null) {
+            setContentView(R.layout.activity_timeline);
+            //get the viewpager
+            vpPager = (ViewPager) findViewById(R.id.viewpager);
 
-        //refresh
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Log.d(TIMELINE_ACTIVITY, "Do SWIPE_REFRESH with params: sinceId:" + sinceId);
-                fetchTimeline(sinceId, 0, true);
-            }
-        });
+            //set the view pager adapter for the pager
+            tweetsPageAdapter = new TweetsPageAdapter(getSupportFragmentManager());
+            vpPager.setAdapter(tweetsPageAdapter);
+            //find the pager sliding tabs
+            PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+            tabStrip.setViewPager(vpPager);
 
-
-        timeLineList = new ArrayList<>();
-        timelineAdapter = new TimelineListAdapter(this, timeLineList);
-
-        lvTweets = (ListView) findViewById(R.id.lvTweets);
-        lvTweets.setAdapter(timelineAdapter);
-        lvTweets.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                Log.d(TIMELINE_ACTIVITY,"activate endless scoreller: sinceId:" + sinceId + " maxId:" + maxId );
-                fetchTimeline(sinceId, maxId, false);
-//                return true;
-                return true;
-            }
-        });
-
-        client = TwitterApp.getRestClient();
-//        fetchTimeline(0, 0, false);
-
-        timelineAdapter.clear();
-        timeLineList.clear();
-        fetchTimeline(1, 0, false);
-
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
+            //fetching user info
+            client = TwitterApp.getRestClient();
+            fetchUserInfo();
+        }
     }
-
-
-//    private void fetchTimeline(int page,int maxId, final boolean endless) {
-    private void fetchTimeline(final long sinceId, final long maxId, final boolean sort) {
-        client.getHomeTimeline(sinceId, maxId, new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//                if(!endless) {
-//                    timelineAdapter.clear();
-//                    timeLineList.clear();
-//                }
-                Log.d(TIMELINE, response.toString());
-                //append tweet to the top of the array
-                timeLineList.addAll(TimelineModel.parseResponse(response));
-                if(sort){
-                    sortTimeline();
-                }
-
-                setSinceMaxId();
-                Log.d(TIMELINE,"list from model:" + timeLineList.size());
-                swipeContainer.setRefreshing(false);
-                timelineAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TIMELINE,"Error fetching data from twitter.", throwable);
-            }
-        }, getResources());
-    }
-
-    private void setSinceMaxId() {
-        this.maxId = timeLineList.get(timeLineList.size() -1).getTweetId() - 1;
-        this.sinceId = timeLineList.get(0).getTweetId();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -136,10 +80,20 @@ public class TimelineActivity extends AppCompatActivity {
             case R.id.mnuCompose:
                 openComposeAtivity();
                 return true;
+            case R.id.mnuProfile:
+                viewUserProfile();
+                return true;
             default:
                 //handle other cases here
                return super.onOptionsItemSelected(item);
         }
+    }
+
+    //show profile view
+    private void viewUserProfile() {
+        //Launch profile view
+        Intent i = new Intent(this , UserProfileActivity.class);
+        startActivity(i);
     }
 
     private void openComposeAtivity() {
@@ -152,16 +106,69 @@ public class TimelineActivity extends AppCompatActivity {
         if(resultCode == RESULT_OK && requestCode == ComposeTweetActivity.COMPOSE_TWEET_ACTIVITY) {
             TimelineModel tweet = (TimelineModel) data.getSerializableExtra(ComposeTweetActivity.NEW_TWEET);
             if(tweet != null) {
-                timeLineList.add(tweet);
-                sortTimeline();
-                setSinceMaxId();
-                timelineAdapter.notifyDataSetChanged();
+
+                TweetsListFragment fragment = (TweetsListFragment) tweetsPageAdapter.getRegisteredFragment(vpPager.getCurrentItem());
+                fragment.add(tweet);
+
+//                fragmentTweetsList.add(tweet);
+
+//                sortTimeline();
+//                setSinceMaxId();
+//                timelineAdapter.notifyDataSetChanged();
+//                //save to db
+//                tweet.save();
             }
         }
     }
 
-    private void sortTimeline() {
-        Comparator<? super TimelineModel> tweeterComparator = new TwitterTimelineComparator();
-        Collections.sort(timeLineList, tweeterComparator);
+    //return the order of the fragments in the view pager
+    public class TweetsPageAdapter extends SmartFragmentStatePagerAdapter {
+        private String tabTitles[] = { "Home", "Mentions"};
+
+        //adapter gets the manager insert or remove fragment from activity
+        public TweetsPageAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        //the order of the creation fragments within the page
+        @Override
+        public Fragment getItem(int position) {
+
+            if(position == 0) {
+                return new HomeTimelineFragment();
+            } else if (position == 1) {
+                return new MentionTimelineFragment();
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
+
+        //how many tabs
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+    }
+
+
+    private void fetchUserInfo() {
+        client.getUserInfo(null, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                UserModel user = UserModel.createModel(response);
+                getSupportActionBar().setTitle("@"+user.getScreenName());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Toast.makeText(TimelineActivity.this , "Cannot fetch user info!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

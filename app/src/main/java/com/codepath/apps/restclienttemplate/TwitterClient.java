@@ -11,6 +11,7 @@ import android.util.Log;
 import com.codepath.apps.restclienttemplate.models.StatusModel;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.io.ByteArrayOutputStream;
@@ -31,24 +32,16 @@ import java.io.InputStream;
  */
 public class TwitterClient extends OAuthBaseClient {
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
-	public static final String REST_URL = "https://api.twitter.com/1.1/"; // Change this, base API URL
+	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = "sOGzCL5cENzeWoRllDZdimuB1";       // Change this
 	public static final String REST_CONSUMER_SECRET = "4LWdlU6X57cL2BkXsbtDGyOql0vPYTTkjt2Xu9UIVYDxnPhWpd"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://cpresttweet"; // Change this (here and in manifest)
     private static final String TWITTER_CLIENT = "TWITTER_CLIENT";
+    private static final Boolean MOCK = false;
+
 
     public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
-	}
-
-	// CHANGE THIS
-	// DEFINE METHODS for different API endpoints here
-	public void getInterestingnessList(AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("?nojsoncallback=1&method=flickr.interestingness.getList");
-		// Can specify query string params directly or through RequestParams.
-		RequestParams params = new RequestParams();
-		params.put("format", "json");
-		client.get(apiUrl, params, handler);
 	}
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
@@ -74,10 +67,11 @@ public class TwitterClient extends OAuthBaseClient {
      */
 
     public void getHomeTimeline(long sinceId,long maxId, AsyncHttpResponseHandler handler, Resources resources) {
-//        if(false) {
-//            handler.onSuccess(200, null, readResource(resources.openRawResource(R.raw.tweets)) );
-//        } else {
-            String apiUrl = getApiUrl("statuses/user_timeline.json");
+        if(MOCK) {
+            Log.d(TWITTER_CLIENT, "MOCKUP home timeline");
+            handler.onSuccess(200, null, readResource(resources.openRawResource(R.raw.tweets)) );
+        } else {
+            String apiUrl = getApiUrl("statuses/home_timeline.json");
             RequestParams params = new RequestParams();
             params.put("count", 15);
             if(maxId > 0) {
@@ -85,10 +79,10 @@ public class TwitterClient extends OAuthBaseClient {
             } else {
                 params.put("since_id", sinceId);
             }
-        Log.d(TWITTER_CLIENT, "Parameters passed in:" + params.toString());
+            Log.d(TWITTER_CLIENT, "Parameters passed in:" + params.toString());
 
             client.get(apiUrl, params, handler);
-//        }
+        }
     }
 
 
@@ -100,6 +94,72 @@ public class TwitterClient extends OAuthBaseClient {
             client.post(apiUrl, params, handler);
         }
     }
+
+
+
+    public void getMentionsTimeLine(long sinceId, long maxId, JsonHttpResponseHandler handler, Resources resources) {
+        if(MOCK) {
+            Log.d(TWITTER_CLIENT, "MOCKUP getMentionsTimeLine");
+            handler.onSuccess(200, null, readResource(resources.openRawResource(R.raw.mentions)) );
+        } else {
+            String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+            RequestParams params = new RequestParams();
+            Log.d(TWITTER_CLIENT, "MENTIONS TIMELINE:" + apiUrl);
+            params.put("count", 15);
+            if (maxId > 0) {
+                params.put("max_id", maxId);
+            } else {
+                params.put("since_id", sinceId);
+            }
+            Log.d(TWITTER_CLIENT, "Parameters passed in:" + params.toString());
+
+            client.get(apiUrl, params, handler);
+        }
+    }
+
+    public void getUserTimeline(String screenName ,long sinceId,long maxId, AsyncHttpResponseHandler handler, Resources resources) {
+
+        if(MOCK) {
+            Log.d(TWITTER_CLIENT, "MOCKUP getUserTimeline");
+            handler.onSuccess(200, null, readResource(resources.openRawResource(R.raw.user_timeline)) );
+        } else {
+
+            String apiUrl = getApiUrl("statuses/user_timeline.json");
+            RequestParams params = new RequestParams();
+            params.put("count", 15);
+            if (screenName != null) {
+                params.put("screen_name", screenName);
+            }
+
+            if (maxId > 0) {
+                params.put("max_id", maxId);
+            } else {
+                params.put("since_id", sinceId);
+            }
+            Log.d(TWITTER_CLIENT, "Parameters passed in:" + params.toString());
+
+            client.get(apiUrl, params, handler);
+        }
+    }
+
+    //returns info about the user who is logged in curently
+    public void getUserInfo(String screenName, AsyncHttpResponseHandler handler) {
+        if(MOCK) {
+            Log.d(TWITTER_CLIENT, "MOCKUP getUserInfo");
+            handler.onSuccess(200, null, readResource(this.context.getResources().openRawResource(R.raw.verify)) );
+        } else {
+            String apiUrl = getApiUrl("account/verify_credentials.json");
+            RequestParams params = new RequestParams();
+            if(screenName != null){
+                apiUrl = getApiUrl("users/show.json");
+                params.put("screen_name", screenName);
+            }
+            Log.d(TWITTER_CLIENT, "request api:" + apiUrl);
+            getClient().get(apiUrl, params, handler);
+        }
+    }
+
+
 
     private static byte[] readResource(InputStream inputStream) {
         Log.d(TWITTER_CLIENT,"READING RESOURCE");
@@ -122,4 +182,5 @@ public class TwitterClient extends OAuthBaseClient {
         }
         return null;
     }
+
 }

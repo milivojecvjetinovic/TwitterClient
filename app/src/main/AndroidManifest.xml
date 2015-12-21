@@ -21,7 +21,7 @@
         android:theme="@style/Tweeter">
         <meta-data
             android:name="AA_DB_NAME"
-            android:value="RestClient.db" />
+            android:value="Twitter.db" />
         <meta-data
             android:name="AA_DB_VERSION"
             android:value="1" />
@@ -50,7 +50,8 @@
             android:name=".TimelineActivity"
             android:label="@string/title_activity_timeline"
             android:theme="@style/Tweeter" />
-        <activity android:name=".ComposeTweetActivity"></activity>
+        <activity android:name=".ComposeTweetActivity" />
+        <activity android:name=".UserProfileActivity"></activity>
     </application>
 
 </manifest>

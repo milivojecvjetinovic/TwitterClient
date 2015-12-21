@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    tools:context="com.codepath.apps.restclienttemplate.fragments.UserHeaderFragment">
+
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="10dp"
+            android:id="@+id/ivUserProfileImage"
+            android:src="@android:drawable/screen_background_light_transparent"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvFullName"
+            android:textSize="16sp"
+            android:text="Username"
+            android:layout_toRightOf="@id/ivUserProfileImage"
+            android:layout_alignTop="@id/ivUserProfileImage"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvFullName"
+            android:layout_alignBottom="@id/ivUserProfileImage"
+            android:id="@+id/tvTagLine"
+            android:textSize="12sp"
+            android:text="Tagline"
+            android:layout_toRightOf="@id/ivUserProfileImage"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/ivUserProfileImage">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:textAlignment="center">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="200 tweet count"
+                    android:layout_weight="1"
+                    android:id="@+id/tvTweetCount"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TWEETS"/>
+
+                <!--android:layout_toRightOf="@id/tvUserFollowing"-->
+                <!--android:layout_below="@id/ivUserProfileImage"-->
+                <!--android:layout_marginLeft="10dp"-->
+            </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                        <!--android:layout_below="@id/ivUserProfileImage"/>-->
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="256 following"
+                            android:layout_weight="1"
+                            android:id="@+id/tvUserFollowing"
+                            android:textAlignment="center"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FOLLOWERS"
+                        android:textAlignment="center"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/tvFollowers"
+                            android:text="15 Followers"
+                            android:layout_weight="1"
+                            android:layout_alignParentLeft="true"/>
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="FOLLOWING"/>
+                        <!--android:layout_marginLeft="10dp"-->
+                                <!--android:layout_below="@id/ivUserProfileImage"-->
+                            <!--android:layout_toRightOf="@id/tvFollowers"/>-->
+                </LinearLayout>
+
+
+
+        </LinearLayout>
+
+
+</RelativeLayout>
